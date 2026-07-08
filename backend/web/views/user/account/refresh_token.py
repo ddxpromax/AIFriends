@@ -1,0 +1,38 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.conf import settings
+
+
+class RefreshTokenView(APIView):
+    def post(self, request):
+        try:
+            refresh_token = request.COOKIES.get('refresh_token')
+            if not refresh_token:
+                return Response({
+                    'result': 'refresh_token_not_exist'
+                }, status=401)
+            refresh = RefreshToken(refresh_token)
+            if settings.SIMPLE_JWT['ROTATE_REFRESH_TOKEN']:
+                refresh.set_jti()
+                return Response({
+                    'result': 'success',
+                    'access': str(refresh.access_token),
+                })
+                response.set_cookie(
+                        key='refresh_token',
+                        value=str(refresh),
+                        httponly=True,
+                        samesite='Lax',
+                        secure=True,
+                        max_age=7 * 24 * 60 * 60,
+                    )
+                return response
+            return Response({
+                'result': 'success',
+                'access': str(refresh.access_token),
+            })
+        except:
+            return Response({
+                'result': "refresh_token_timeout"
+            }, status=401)
