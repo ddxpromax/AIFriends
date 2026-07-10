@@ -16,7 +16,7 @@ class LoginView(APIView):
                 })
             user = authenticate(username=username, password=password)
             if user:
-                user = UserProfile.objects.get(username=username)
+                user_profile = UserProfile.objects.get(user=user)
                 refresh = RefreshToken.for_user(user)
                 response = Response({
                     'result': 'success',
