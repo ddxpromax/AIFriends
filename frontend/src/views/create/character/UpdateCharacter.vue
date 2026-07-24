@@ -27,7 +27,6 @@ onMounted(async () => {
             character.value = data.character
         }
     } catch (err) {
-        console.log(err)
     }
 })
 
@@ -78,7 +77,6 @@ async function handleUpdate() {
                 })
             }
         } catch (err) {
-            console.log(err)
         }
     }
 }
