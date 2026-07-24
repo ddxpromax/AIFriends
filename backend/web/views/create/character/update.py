@@ -16,7 +16,7 @@ class UpdateCharacterView(APIView):
             name = request.data['name'].strip()
             profile = request.data['profile'].strip()[:100000]
             photo = request.FILES.get('photo', None)
-            background_image = request.FIELS.get('background_image', None)
+            background_image = request.FILES.get('background_image', None)
 
             if not name:
                 return Response({
@@ -34,7 +34,7 @@ class UpdateCharacterView(APIView):
                 character.background_image = background_image
             character.name = name
             character.profile = profile
-            character.create_time = now()
+            character.update_time = now()
             character.save()
             return Response({
                 'result': 'success'
