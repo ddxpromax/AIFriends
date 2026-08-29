@@ -1,13 +1,17 @@
 <script setup>
-import {useTemplateRef, computed} from "vue";
+import {useTemplateRef, computed, nextTick} from "vue";
 import InputField from './input_field/InputField.vue'
 import CharacterPhotoField from './character_photo_field/CharacterPhotoField.vue'
 
 const props = defineProps(['friend'])
 const modalRef = useTemplateRef('modal-ref')
+const inputRef = useTemplateRef('input-ref')
 
-function showModal() {
+async function showModal() {
     modalRef.value.showModal()
+
+    await nextTick()
+    inputRef.value.focus()
 }
 
 const modalStyle = computed(() => {
@@ -31,8 +35,12 @@ defineExpose({
 <template>
     <dialog ref="modal-ref" class="modal">
         <div class="modal-box w-90 h-150" :style="modalStyle">
-            <button @click="modalRef.close()" class="btn btn-sm btn-circle btn-ghost bg-transparen absolute right-1 top-1">✕</button>
-            <InputField />
+            <button @click="modalRef.close()" class="btn btn-sm btn-circle btn-ghost bg-transparent absolute right-1 top-1">✕</button>
+            <InputField 
+              v-if="friend"
+              ref="input-ref"
+              :friendId="friend.id"
+            />
             <CharacterPhotoField v-if="friend" :character="friend.character" />
         </div>
     </dialog>

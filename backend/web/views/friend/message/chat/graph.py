@@ -14,6 +14,12 @@ class ChatGraph:
             model='qwen3.5-flash',
             openai_api_key=os.getenv('API_KEY'),
             openai_api_base=os.getenv('API_BASE'),
+            streaming=True, 
+            model_kwargs={
+                "stream_options": {
+                    "include_usage": True,
+                }
+            }
         )
 
         class AgentState(TypedDict):

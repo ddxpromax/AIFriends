@@ -1,6 +1,6 @@
 <script setup>
 import Character from "@/components/character/Character.vue";
-import {ref, useTemplateRef, onMounted, onBeforeUnmount} from "vue";
+import {ref, useTemplateRef, onMounted, onBeforeUnmount, nextTick} from "vue";
 import api from "@/js/http/api.js"
 
 const friends = ref([])
@@ -87,7 +87,7 @@ function removeFriend(friendId) {
             />
         </div>
 
-        <div class="h-2 mt-8"></div>
+        <div ref="sentinel-ref" class="h-2 mt-8"></div>
         <div v-if="isLoading" class="text-gray-500 mt-4">加载中...</div>
         <div v-else-if="!hasFriends" class="text-gray-500 mt-4">没有更多聊天了</div>
     </div>
