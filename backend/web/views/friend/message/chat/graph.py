@@ -1,5 +1,4 @@
 import os
-from pprint import pprint
 
 from typing import TypedDict, Annotated, Sequence
 
@@ -39,7 +38,6 @@ class ChatGraph:
             messages: Annotated[Sequence[BaseMessage], add_messages]
 
         def model_call(state: AgentState) -> AgentState:
-            pprint(state)
             res = llm.invoke(state['messages'])
             return {'messages': [res]}
 
