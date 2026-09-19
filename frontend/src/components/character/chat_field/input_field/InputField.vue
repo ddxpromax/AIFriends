@@ -4,23 +4,29 @@ import { ref, useTemplateRef } from 'vue';
 import MicIcon from '../../icons/MicIcon.vue';
 import SendIcon from '../../icons/SendIcon.vue';
 import streamApi from '@/js/http/streamApi.js';
+import Microphone from './Microphone.vue';
 
 const props = defineProps(['friendId'])
 const emit = defineEmits(['pushBackMessage', 'addToLastMessage'])
 const inputRef = useTemplateRef('input-ref')
 const message = ref('')
-let isProcessing = false
+let processId = 0
+const showMic = ref(false)
 
 function focus() {
     inputRef.value.focus()
 }
 
 async function handleSend() {
-    if (isProcessing) return
-    isProcessing = true
-
-    const content = message.value.trim()
+    let content
+    if (audio_msg) {
+        content = audio_msg.trim()
+    } else {
+        content = message.value.trim()
+    }
     if (!content) return
+
+    const curId = ++ processId
 
     emit('pushBackMessage', {role: 'user', content: content, id: crypto.randomUUID()})
     emit('pushBackMessage', {role: 'ai', content: '', id: crypto.randomUUID()})
@@ -32,29 +38,37 @@ async function handleSend() {
                 friend_id: props.friendId,
                 message: content,
             },
-            onmessage(data, isDone) {
-                if (isDone) {
-                    isProcessing = false
-                } else if (data.content) {
+            onmessage(data) {
+                if (curId !== processId) return
+
+                if (data.content) {
                     emit('addToLastMessage', data.content)
                 }
             }, 
             onerror(err) {
-                isProcessing = false
             },
         })
     } catch (err) {
-        isProcessing = false
     }
+}
+
+function close() {
+    ++ processId
+    showMic.value = false
+}
+
+function handleStop() {
+    ++ processId
 }
 
 defineExpose({
     focus,
+    close,
 })
 </script>
 
 <template>
-    <form @submit.prevent="handleSend" class="absolute bottom-4 left-2 h-12 w-86 flex items-center">
+    <form v-if="!showMic" @submit.prevent="handleSend" class="absolute bottom-4 left-2 h-12 w-86 flex items-center">
         <input 
             ref="input-ref"
             v-model="message"
@@ -65,10 +79,16 @@ defineExpose({
         <div @click="handleSend" class="absolute right-2 w-8 h-8 flex justify-center items-center cursor-pointer">
             <SendIcon />
         </div>
-        <div class="absolute right-10 w-8 h-8 flex justify-center items-center cursor-pointer">
+        <div @click="showMic = true" v class="absolute right-10 w-8 h-8 flex justify-center items-center cursor-pointer">
             <MicIcon />
         </div>
     </form>
+    <Microphone 
+        v-else
+        @close="showMic = false" 
+        @send="handleSend"    
+        @stop="handleStop"
+    />
 </template>
 
 <style scoped>
