@@ -17,7 +17,7 @@ function focus() {
     inputRef.value.focus()
 }
 
-async function handleSend() {
+async function handleSend(event, audio_msg) {
     let content
     if (audio_msg) {
         content = audio_msg.trim()
